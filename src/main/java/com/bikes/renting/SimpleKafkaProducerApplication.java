@@ -1,4 +1,4 @@
-package com.bikes.renting.model.queue_engine;
+package com.bikes.renting;
 
 
 import com.bikes.renting.model.queue_engine.consumer.SimpleKafkaConsumer;
