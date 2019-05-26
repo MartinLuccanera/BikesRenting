@@ -1,4 +1,4 @@
-package com.bikes.renting.queue_engine.consumer;
+package com.bikes.renting.model.queue_engine.consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;

@@ -1,7 +1,7 @@
-package com.bikes.renting.queue_engine;
+package com.bikes.renting.model.queue_engine;
 
 
-import com.bikes.renting.queue_engine.consumer.SimpleKafkaConsumer;
+import com.bikes.renting.model.queue_engine.consumer.SimpleKafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.log4j.Logger;
@@ -13,7 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.Properties;
-import static com.bikes.renting.RentalTypes.TOPICS;
+import static com.bikes.renting.model.RentalTypes.TOPICS;
 
 @SpringBootApplication
 public class SimpleKafkaProducerApplication implements CommandLineRunner {
