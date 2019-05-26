@@ -1,4 +1,4 @@
-package com.bikes.renting.demo.consumer;
+package com.bikes.renting.queue_engine.consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -15,15 +15,12 @@ import java.util.Map;
 import java.util.Properties;
 
 public class SimpleKafkaConsumer {
-
     private static final Logger logger = Logger.getLogger(SimpleKafkaConsumer.class);
-
     private KafkaConsumer<String, String> kafkaConsumer;
 
-    public SimpleKafkaConsumer(String theTechCheckTopicName, Properties consumerProperties) {
-
+    public SimpleKafkaConsumer(String rentalTopicName, Properties consumerProperties) {
         kafkaConsumer = new KafkaConsumer<>(consumerProperties);
-        kafkaConsumer.subscribe(Arrays.asList(theTechCheckTopicName));
+        kafkaConsumer.subscribe(Arrays.asList(rentalTopicName.split(",")));
     }
 
     /**
@@ -32,30 +29,19 @@ public class SimpleKafkaConsumer {
      * For this example, the list consists of only one topic. But you can give it a try with multiple topics.
      */
     public void runSingleWorker() {
-
         /*
          * We will start an infinite while loop, inside which we'll be listening to
          * new messages in each topic that we've subscribed to.
          */
         while(true) {
-
             ConsumerRecords<String, String> records = kafkaConsumer.poll(100);
-
             for (ConsumerRecord<String, String> record : records) {
+                /*Whenever there's a new message in the Kafka topic, we'll get the message in this loop, as
+                the record object.*/
 
-                /*
-                Whenever there's a new message in the Kafka topic, we'll get the message in this loop, as
-                the record object.
-                 */
-
-                /*
-                Getting the message as a string from the record object.
-                 */
+                /*Getting the message as a string from the record object.*/
                 String message = record.value();
-
-                /*
-                Logging the received message to the console.
-                 */
+                /*Logging the received message to the console.*/
                 logger.info("Received message: " + message);
 
                 /*
@@ -68,7 +54,6 @@ public class SimpleKafkaConsumer {
                  */
                 try {
                     JSONObject receivedJsonObject = new JSONObject(message);
-
                     /*
                     To make sure we successfully deserialized the message to a JSON object, we'll
                     log the index of JSON object.
@@ -87,12 +72,9 @@ public class SimpleKafkaConsumer {
                  */
                 {
                     Map<TopicPartition, OffsetAndMetadata> commitMessage = new HashMap<>();
-
                     commitMessage.put(new TopicPartition(record.topic(), record.partition()),
                             new OffsetAndMetadata(record.offset() + 1));
-
                     kafkaConsumer.commitSync(commitMessage);
-
                     logger.info("Offset committed to Kafka.");
                 }
             }

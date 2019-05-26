@@ -1,7 +1,7 @@
-package com.bikes.renting.demo;
+package com.bikes.renting.queue_engine;
 
 
-import com.bikes.renting.demo.consumer.SimpleKafkaConsumer;
+import com.bikes.renting.queue_engine.consumer.SimpleKafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.log4j.Logger;
@@ -13,12 +13,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.Properties;
+import static com.bikes.renting.RentalTypes.TOPICS;
 
 @SpringBootApplication
 public class SimpleKafkaProducerApplication implements CommandLineRunner {
-
-    @Value("${kafka.topic.thetechcheck}")
-    private String theTechCheckTopicName;
 
     @Value("${kafka.bootstrap.servers}")
     private String kafkaBootstrapServers;
@@ -84,11 +82,12 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
         /*
          * Creating a thread to listen to the kafka topic
          */
+        //TODO: Here I create all the consumers I need for my specified types
         Thread kafkaConsumerThread = new Thread(() -> {
             logger.info("Starting Kafka consumer thread.");
 
             SimpleKafkaConsumer simpleKafkaConsumer = new SimpleKafkaConsumer(
-                    theTechCheckTopicName,
+                    TOPICS,
                     consumerProperties
             );
 
@@ -115,7 +114,8 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
         simple message to Kafka.
          */
         for (int index = 0; index < 10; index++) {
-            sendKafkaMessage("The index is now: " + index, producer, theTechCheckTopicName);
+            //TODO: This here used to be only 1 topic, now I have a string with all of them. Fix
+            sendKafkaMessage("The index is now: " + index, producer, TOPICS);
         }
 
         /*
@@ -160,7 +160,8 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
             You can use any JSON library for this, just make sure it serializes your objects properly.
             A popular alternative to the one I've used is Gson.
              */
-            sendKafkaMessage(jsonObject.toString(), producer, theTechCheckTopicName);
+            //TODO: This here used to be only 1 topic, now I have a string with all of them. Fix
+            sendKafkaMessage(jsonObject.toString(), producer, TOPICS);
         }
     }
 
