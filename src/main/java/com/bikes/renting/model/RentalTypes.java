@@ -2,6 +2,9 @@ package com.bikes.renting.model;
 
 import com.google.common.collect.ImmutableList;
 
+/**
+ * Helper class to keep rental types / kafka topics.
+ */
 public class RentalTypes {
     /**
      * List of composed topic types for kafka. (Example: family type of rental)

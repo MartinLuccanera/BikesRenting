@@ -4,6 +4,9 @@ import com.bikes.renting.model.iface.Rental;
 
 import static com.bikes.renting.model.PricingConstants.HOUR_PRICE;
 
+/**
+ * <p>Rental implementation for Hourly rentals.</p>
+ */
 public class HourlyRental implements Rental {
 
     @Override

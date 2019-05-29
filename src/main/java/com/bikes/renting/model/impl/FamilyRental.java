@@ -6,6 +6,9 @@ import java.util.List;
 
 import static com.bikes.renting.model.PricingConstants.FAMILY_DISCOUNT;
 
+/**
+ * <p>Rental implementation for family-type of rentals.</p>
+ */
 public class FamilyRental implements Rental {
     private List<Rental> rentals;
     //TODO Implement calculation for family rental. How to instantiate? How to calculate?

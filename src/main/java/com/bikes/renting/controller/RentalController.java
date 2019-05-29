@@ -16,6 +16,9 @@ import java.util.List;
 
 //TODO: How to test https://reversecoding.net/spring-mvc-requestparam-binding-request-parameters/
 
+/**
+ * <p>Endpoint to post bike rental information and/or obtain rental pricing.</p>
+ */
 @RestController
 @RequestMapping("/bike")
 public class RentalController {
@@ -34,6 +37,7 @@ public class RentalController {
     @RequestMapping(
             value = "/rental",
             method = RequestMethod.POST,
+            params = {"rentalType", "quantity"}, // To allow overloaded methods based on parameters
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public @ResponseBody
@@ -73,6 +77,7 @@ public class RentalController {
     @RequestMapping(
             value = "/rental",
             method = RequestMethod.POST,
+            params = {"rentalType", "subRental", "quantity"}, // To allow overloaded methods based on parameters
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public @ResponseBody
