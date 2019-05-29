@@ -14,6 +14,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.Duration;
+
 import static com.bikes.renting.model.RentalTypes.TOPICS;
 
 @SpringBootApplication
@@ -26,10 +27,15 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
     @Value("${zookeeper.host}")
     String zookeeperHost;
 
+    /**
+     * <p>Starts the application.
+     * -> Creates consumers on all topics who wait until there are messages to read.
+     * When API endpoint is hit {@link com.bikes.renting.controller.RentalController}, producer(s) are created and
+     * messages are sent to kafka.</p>
+     *
+     * @param args nothing special, regular java boilerplate code.
+     */
     public static void main( String[] args ) {
-        //TODO: Use this class to create the consumers. Then we create the producer when the first message arrives.
-        // Hence, the app will show whatever is sent each time a message arrives and the process will be demonstrated.
-        // I need to create all the consumers here. Consumer for family, right?
         SpringApplication.run(SimpleKafkaProducerApplication.class, args);
     }
 
