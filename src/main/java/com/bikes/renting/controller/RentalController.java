@@ -6,13 +6,14 @@ import com.google.gson.JsonObject;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.log4j.Logger;
-import com.bikes.renting.model.message_engine.producer.KafkaProducerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Iterator;
 import java.util.List;
+
+import static com.bikes.renting.model.message_engine.producer.KafkaProducerFactory.*;
 
 //TODO: How to test https://reversecoding.net/spring-mvc-requestparam-binding-request-parameters/
 
@@ -45,12 +46,16 @@ public class RentalController {
             @RequestParam(name = "rentalType") String rentalType,
             @RequestParam(name = "quantity") int quantity)
     {
-        KafkaProducer<String, String> kafkaProducer = KafkaProducerFactory.createKafKafkaProducer();
+        KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
         logger.debug("producer create" + kafkaProducer.toString());
 
-        // Here we should check for params format, validity, quantity, etc.
-        // For simplicity's sake I'll just avoid said checks.
+        /* NOTE:
+         * Here we should check for params format, validity, quantity, etc.
+         * For simplicity's sake I'll just avoid said checks.
+         */
 
+
+        //Assembling the message that will be sent to Kafka.
         JsonObject payload = assembleMessage(rentalType, quantity);
 
         sendKafkaMessage(
@@ -86,12 +91,16 @@ public class RentalController {
             @RequestParam (name = "subRental") List<String> rentalTypes,
             @RequestParam (name = "quantity") List<String> quantities)
     {
-        KafkaProducer<String, String> kafkaProducer = KafkaProducerFactory.createKafKafkaProducer();
+        KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
         logger.debug("producer create" + kafkaProducer.toString());
 
-        // Here we should check for params format, validity, quantity, etc.
-        // For simplicity's sake I'll just avoid said checks.
+        /* NOTE:
+         * Here we should check for params format, validity, quantity, etc.
+         * For simplicity's sake I'll just avoid said checks.
+         */
 
+
+        //Assembling the message that will be sent to Kafka.
         JsonObject payload = assembleMessage(composedTopicType, rentalTypes, quantities);
 
         sendKafkaMessage(
@@ -178,7 +187,7 @@ public class RentalController {
     {
         JsonObject payload = assembleMessage(composedTopicType, rentalTypes, quantities);
 
-        KafkaProducer<String, String> kafkaProducer = KafkaProducerFactory.createKafKafkaProducer();
+        KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
         sendKafkaMessage(payload.toString(), kafkaProducer, payload.getAsJsonPrimitive("topic").getAsString());
 
         return " Got to endpoint + " + payload;
@@ -191,7 +200,7 @@ public class RentalController {
      * @param producer Kafka producer (sender). Serves as entry point to kafka.
      * @param topic Kafka topic in which we are gonna send this message {@link com.bikes.renting.model.RentalTypes}
      */
-    private static void sendKafkaMessage(String payload, KafkaProducer<String, String> producer,String topic) {
+    private void sendKafkaMessage(String payload, KafkaProducer<String, String> producer,String topic) {
         logger.info("Sending Kafka message: " + payload);
         producer.send(new ProducerRecord<>(topic, payload));
     }

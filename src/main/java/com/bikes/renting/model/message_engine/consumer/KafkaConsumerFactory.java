@@ -35,6 +35,9 @@ public class KafkaConsumerFactory {
         consumerProperties.put("max.poll.records", "1");
         consumerProperties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         consumerProperties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        /*
+         * Creating a Kafka Consumer object with above configuration.
+         */
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProperties);
         logger.debug("Created kafkaConsumer with properties:\n" + consumerProperties.toString());
         consumer.subscribe(rentalTopicName);

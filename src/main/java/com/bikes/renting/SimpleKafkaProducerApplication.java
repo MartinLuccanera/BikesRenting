@@ -21,12 +21,6 @@ import static com.bikes.renting.model.RentalTypes.TOPICS;
 public class SimpleKafkaProducerApplication implements CommandLineRunner {
     private static final Logger logger = Logger.getLogger(SimpleKafkaProducerApplication.class);
 
-    @Value("${kafka.bootstrap.servers}")
-    private String kafkaBootstrapServers;
-
-    @Value("${zookeeper.host}")
-    String zookeeperHost;
-
     /**
      * <p>Starts the application.
      * -> Creates consumers on all topics who wait until there are messages to read.
@@ -46,7 +40,6 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
          */
         Thread kafkaConsumerThread = new Thread(() -> {
             logger.info("Starting Kafka consumer thread.");
-            //KafkaProducer<String, String> kafkaProducer = KafkaProducerFactory.createKafKafkaProducer();
             KafkaConsumer<String, String> simpleKafkaConsumer = KafkaConsumerFactory.
                     createKafKafkaConsumer(TOPICS);
             runSingleWorker(simpleKafkaConsumer);
