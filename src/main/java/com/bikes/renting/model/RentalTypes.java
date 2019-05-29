@@ -1,5 +1,16 @@
 package com.bikes.renting.model;
 
+import com.google.common.collect.ImmutableList;
+
 public class RentalTypes {
-    public static final String TOPICS = "hour,day,week,family";
+    /**
+     * List of composed topic types for kafka. (Example: family type of rental)
+     */
+    public static final ImmutableList<String> COMPOSED_TOPICS = ImmutableList.of("family");
+
+    /**
+     * List of topics for kafka (kinds of rental).
+     */
+    public static final ImmutableList<String> TOPICS = ImmutableList.of("hour","day","week",
+            String.join(",", COMPOSED_TOPICS));
 }

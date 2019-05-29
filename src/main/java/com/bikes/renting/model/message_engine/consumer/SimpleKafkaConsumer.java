@@ -1,4 +1,4 @@
-package com.bikes.renting.model.queue_engine.consumer;
+package com.bikes.renting.model.message_engine.consumer;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
