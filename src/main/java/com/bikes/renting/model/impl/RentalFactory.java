@@ -21,7 +21,7 @@ public class RentalFactory {
      */
     public static Rental createRental(JsonObject rental) {
 
-        switch (rental.get(RENTAL_TYPE_JSON_KEY).toString()) {
+        switch (rental.get(RENTAL_TYPE_JSON_KEY).getAsString()) {
             case RENTAL_TYPE_FAMILY:
                 return new FamilyRental(rental.get(NESTED_RENTALS_JSON_KEY).getAsJsonArray());
             case RENTAL_TYPE_HOUR:

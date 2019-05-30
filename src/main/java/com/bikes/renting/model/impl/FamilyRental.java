@@ -17,7 +17,7 @@ import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTAL_TYP
 public class FamilyRental implements Rental {
     private List<Rental> rentals = new ArrayList<>();
 
-    FamilyRental(JsonArray rentals) {
+    public FamilyRental(JsonArray rentals) {
         for (JsonElement rental : rentals) {
             JsonObject rentalObj = rental.getAsJsonObject();
             this.rentals.add(
@@ -31,7 +31,7 @@ public class FamilyRental implements Rental {
     public double calculateRentalPricing() {
         double result = 0;
         for(Rental rental : this.rentals) {
-            result = rental.calculateRentalPricing();
+            result = result + rental.calculateRentalPricing();
         }
         return result * FAMILY_DISCOUNT;
     }

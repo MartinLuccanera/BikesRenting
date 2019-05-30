@@ -90,7 +90,7 @@ public class RentalController {
     public @ResponseBody
     String saveBikeRental(
             @RequestParam (name = "rentalType") String composedTopicType,
-            @RequestParam (name = "subRental") List<String> rentalTypes,
+            @RequestParam (name = "subRental", required = false) List<String> rentalTypes,
             @RequestParam (name = "quantity") List<String> quantities)
     {
         KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
@@ -178,7 +178,12 @@ public class RentalController {
      *
      * @return This return is NOT a production kind of return but a way to assert endpoint reach.
      */
-    @RequestMapping(value = "/rental", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            value = "/rental",
+            method = RequestMethod.GET,
+            params = {"rentalType", "subRental", "quantity"}, // To allow overloaded methods based on parameters
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public String getResponse(
@@ -191,6 +196,38 @@ public class RentalController {
         KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
         sendKafkaMessage(payload.toString(), kafkaProducer, payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString());
 
+        return " Got to endpoint + " + payload;
+    }
+
+    /**
+     * <p>Endpoint for testing calculations.</p>
+     *
+     * @param rentalType Atomic rental representing a rental type and a kafka topic {@link com.bikes.renting.model.RentalTypes}.
+     * @param quantity Amount of hours/days/weeks for the rental type.
+     * @return This return is NOT a production kind of return but a way to assert endpoint reach.
+     */
+    @RequestMapping(
+            value = "/rental",
+            method = RequestMethod.GET,
+            params = {"rentalType", "quantity"}, // To allow overloaded methods based on parameters
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.OK)
+    @ResponseBody
+    public String getResponse(
+            @RequestParam(name = "rentalType") String rentalType,
+            @RequestParam(name = "quantity") int quantity)
+    {
+        JsonObject payload = assembleMessage(rentalType, quantity);
+
+        KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
+
+        sendKafkaMessage(
+                payload.toString(),
+                kafkaProducer,
+                payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString()
+        );
+        logger.debug("Message " + payload.toString() + " sent.");
         return " Got to endpoint + " + payload;
     }
 
