@@ -8,8 +8,7 @@ public interface Rental{
     /**
      * <p>Calculates the cost of the rental.</p>
      *
-     * @param timeUnits Units of time the rental will last.
      * @return Total cost of rental.
      */
-    double calculateRentalPricing(int timeUnits);
+    double calculateRentalPricing();
 }

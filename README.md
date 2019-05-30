@@ -7,6 +7,8 @@ JSON structure for regular rentals
     "units": 0
 }
 ```
+The list of rental types is: ["hour","day","week","family"].
+
 For family (which is a composed rentalType)
 ```json
 {
@@ -52,3 +54,4 @@ Sources:
 * [spring.io](https://spring.io/guides/tutorials/rest/)
 * [overloaded method spring](https://stackoverflow.com/questions/30380498/overload-controller-method-in-java-spring)
 * [kafka definitive guide](https://www.oreilly.com/library/view/kafka-the-definitive/9781491936153/ch04.html)
+* [Gson string-jsonObject](https://www.baeldung.com/gson-string-to-jsonobject)

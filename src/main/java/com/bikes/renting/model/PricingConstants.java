@@ -24,5 +24,15 @@ public class PricingConstants {
      * Family rental discount coefficient.
      */
     public static final double FAMILY_DISCOUNT = 0.7;
+
+    /**
+     * Family rental max size.
+     */
+    public static final double FAMILY_MAX_SIZE = 5;
+
+    /**
+     * Family rental max size.
+     */
+    public static final double FAMILY_MIN_SIZE = 3;
 }
 

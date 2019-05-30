@@ -8,9 +8,14 @@ import static com.bikes.renting.model.PricingConstants.HOUR_PRICE;
  * <p>Rental implementation for Hourly rentals.</p>
  */
 public class HourlyRental implements Rental {
+    private int timeUnits;
+
+    HourlyRental(int timeUnits) {
+        this.timeUnits = timeUnits;
+    }
 
     @Override
-    public double calculateRentalPricing(int timeUnits) {
-        return timeUnits * HOUR_PRICE;
+    public double calculateRentalPricing() {
+        return this.timeUnits * HOUR_PRICE;
     }
 }

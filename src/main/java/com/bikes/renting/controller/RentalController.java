@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.bikes.renting.model.message_engine.JsonKeyConstants.NESTED_RENTALS_JSON_KEY;
+import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTALS_QUANTITY_JSON_KEY;
+import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTAL_TYPE_JSON_KEY;
 import static com.bikes.renting.model.message_engine.producer.KafkaProducerFactory.*;
 
 //TODO: How to test https://reversecoding.net/spring-mvc-requestparam-binding-request-parameters/
@@ -54,14 +57,13 @@ public class RentalController {
          * For simplicity's sake I'll just avoid said checks.
          */
 
-
         //Assembling the message that will be sent to Kafka.
         JsonObject payload = assembleMessage(rentalType, quantity);
 
         sendKafkaMessage(
                 payload.toString(),
                 kafkaProducer,
-                payload.getAsJsonPrimitive("topic").getAsString()
+                payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString()
         );
         logger.debug("Message " + payload.toString() + " sent.");
         return "Received message: " + payload;
@@ -99,14 +101,13 @@ public class RentalController {
          * For simplicity's sake I'll just avoid said checks.
          */
 
-
         //Assembling the message that will be sent to Kafka.
         JsonObject payload = assembleMessage(composedTopicType, rentalTypes, quantities);
 
         sendKafkaMessage(
                 payload.toString(),
                 kafkaProducer,
-                payload.getAsJsonPrimitive("topic").getAsString()
+                payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString()
         );
 
         logger.debug("Message " + payload.toString() + " sent.");
@@ -128,7 +129,7 @@ public class RentalController {
 
         //payload is the message we will send to kafka as a JsonObject
         JsonObject payload = new JsonObject();
-        payload.addProperty("topic", composedTopicType);
+        payload.addProperty(RENTAL_TYPE_JSON_KEY, composedTopicType);
 
         JsonArray subRentalsArray = new JsonArray();
         JsonObject subRental = new JsonObject();
@@ -147,7 +148,7 @@ public class RentalController {
             subRental = new JsonObject();
         }
 
-        payload.add("rentals", subRentalsArray);
+        payload.add(NESTED_RENTALS_JSON_KEY, subRentalsArray);
         return payload;
     }
 
@@ -162,8 +163,8 @@ public class RentalController {
      */
     private JsonObject assembleMessage(String rentalType, int quantity) {
         JsonObject familyRental = new JsonObject();
-        familyRental.addProperty("topic", rentalType);
-        familyRental.addProperty("units", quantity);
+        familyRental.addProperty(RENTAL_TYPE_JSON_KEY, rentalType);
+        familyRental.addProperty(RENTALS_QUANTITY_JSON_KEY, quantity);
         return familyRental;
     }
 
@@ -188,7 +189,7 @@ public class RentalController {
         JsonObject payload = assembleMessage(composedTopicType, rentalTypes, quantities);
 
         KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
-        sendKafkaMessage(payload.toString(), kafkaProducer, payload.getAsJsonPrimitive("topic").getAsString());
+        sendKafkaMessage(payload.toString(), kafkaProducer, payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString());
 
         return " Got to endpoint + " + payload;
     }
