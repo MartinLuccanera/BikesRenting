@@ -28,7 +28,7 @@ public class FamilyRentalTest {
     }
 
     @Test
-    public void sum(){
+    public void sumUsingComposite_thenIndividualCalculations(){
         assertThat(familyRental.calculateRentalPricing(), equalTo(totalSum() * FAMILY_DISCOUNT));
     }
 

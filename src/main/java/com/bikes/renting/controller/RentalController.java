@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,11 +13,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static com.bikes.renting.model.message_engine.JsonKeyConstants.NESTED_RENTALS_JSON_KEY;
 import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTALS_QUANTITY_JSON_KEY;
 import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTAL_TYPE_JSON_KEY;
 import static com.bikes.renting.model.message_engine.producer.KafkaProducerFactory.*;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 //TODO: How to test https://reversecoding.net/spring-mvc-requestparam-binding-request-parameters/
 
@@ -45,12 +49,10 @@ public class RentalController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public @ResponseBody
-    String saveBikeRental(
+    void saveBikeRental(
             @RequestParam(name = "rentalType") String rentalType,
             @RequestParam(name = "quantity") int quantity)
     {
-        KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
-        logger.debug("producer create" + kafkaProducer.toString());
 
         /* NOTE:
          * Here we should check for params format, validity, quantity, etc.
@@ -62,11 +64,9 @@ public class RentalController {
 
         sendKafkaMessage(
                 payload.toString(),
-                kafkaProducer,
                 payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString()
         );
         logger.debug("Message " + payload.toString() + " sent.");
-        return "Received message: " + payload;
     }
 
     /**
@@ -88,13 +88,11 @@ public class RentalController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public @ResponseBody
-    String saveBikeRental(
+    void saveBikeRental(
             @RequestParam (name = "rentalType") String composedTopicType,
             @RequestParam (name = "subRental", required = false) List<String> rentalTypes,
             @RequestParam (name = "quantity") List<String> quantities)
     {
-        KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
-        logger.debug("producer create" + kafkaProducer.toString());
 
         /* NOTE:
          * Here we should check for params format, validity, quantity, etc.
@@ -106,12 +104,10 @@ public class RentalController {
 
         sendKafkaMessage(
                 payload.toString(),
-                kafkaProducer,
                 payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString()
         );
 
         logger.debug("Message " + payload.toString() + " sent.");
-        return "Received message: " + payload;
     }
 
     /**
@@ -186,17 +182,17 @@ public class RentalController {
     )
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
-    public String getResponse(
+    public void getResponse(
             @RequestParam (name = "rentalType") String composedTopicType,
             @RequestParam (name = "subRental") List<String> rentalTypes,
             @RequestParam (name = "quantity") List<String> quantities)
     {
         JsonObject payload = assembleMessage(composedTopicType, rentalTypes, quantities);
 
-        KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
-        sendKafkaMessage(payload.toString(), kafkaProducer, payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString());
-
-        return " Got to endpoint + " + payload;
+        sendKafkaMessage(
+                payload.toString(),
+                payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString()
+        );
     }
 
     /**
@@ -214,32 +210,30 @@ public class RentalController {
     )
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
-    public String getResponse(
+    public void getResponse(
             @RequestParam(name = "rentalType") String rentalType,
             @RequestParam(name = "quantity") int quantity)
     {
         JsonObject payload = assembleMessage(rentalType, quantity);
 
-        KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
-
         sendKafkaMessage(
                 payload.toString(),
-                kafkaProducer,
                 payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString()
         );
-        logger.debug("Message " + payload.toString() + " sent.");
-        return " Got to endpoint + " + payload;
     }
 
     /**
      * <p>Function to send messages to kafka. Receives producer (sender) and message as parameters</p>
      *
      * @param payload Message to be sent via {@link KafkaProducer}.
-     * @param producer Kafka producer (sender). Serves as entry point to kafka.
      * @param topic Kafka topic in which we are gonna send this message {@link com.bikes.renting.model.RentalTypes}
      */
-    private void sendKafkaMessage(String payload, KafkaProducer<String, String> producer,String topic) {
-        logger.info("Sending Kafka message: " + payload);
-        producer.send(new ProducerRecord<>(topic, payload));
+    private void sendKafkaMessage(String payload, String topic) {
+        //Singleton creator.
+        KafkaProducer<String, String> kafkaProducer = createKafKafkaProducer();
+        logger.debug("producer created \n" + kafkaProducer.toString());
+        logger.info("Sending Kafka message: \n" + payload);
+
+        kafkaProducer.send(new ProducerRecord<>(topic, payload));
     }
 }
