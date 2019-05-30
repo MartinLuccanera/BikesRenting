@@ -1,11 +1,9 @@
 package com.bikes.renting.controller;
 
-import com.bikes.renting.SimpleKafkaProducerApplication;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
+import static com.bikes.renting.controller.ParametersConstants.NESTED_RENTALS_PARAMETER_KEY;
+import static com.bikes.renting.controller.ParametersConstants.RENTALS_QUANTITY_PARAMETER_KEY;
+import static com.bikes.renting.controller.ParametersConstants.RENTAL_TYPE_PARAMETER_KEY;
 import static com.bikes.renting.model.message_engine.JsonKeyConstants.NESTED_RENTALS_JSON_KEY;
 import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTALS_QUANTITY_JSON_KEY;
 import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTAL_TYPE_JSON_KEY;
 import static com.bikes.renting.model.message_engine.producer.KafkaProducerFactory.*;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 //TODO: How to test https://reversecoding.net/spring-mvc-requestparam-binding-request-parameters/
 
@@ -30,7 +28,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @RestController
 @RequestMapping("/bike")
 public class RentalController {
-    private static final Logger logger = Logger.getLogger(SimpleKafkaProducerApplication.class);
+    private static final Logger logger = Logger.getLogger(RentalController.class);
 
     /**
      * <p>Endpoint to store calculations into persistent resource.
@@ -39,19 +37,17 @@ public class RentalController {
      *
      * @param rentalType Atomic rental type which also is used as kafka topic {@link com.bikes.renting.model.RentalTypes}.
      * @param quantity Amount of hours/days/weeks for the rental type.
-     *
-     * @return This return is NOT a production kind of return but a way to assert endpoint reach.
      */
     @RequestMapping(
             value = "/rental",
             method = RequestMethod.POST,
-            params = {"rentalType", "quantity"}, // To allow overloaded methods based on parameters
+            params = {RENTAL_TYPE_PARAMETER_KEY, RENTALS_QUANTITY_PARAMETER_KEY}, // To allow overloaded methods based on parameters
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public @ResponseBody
     void saveBikeRental(
-            @RequestParam(name = "rentalType") String rentalType,
-            @RequestParam(name = "quantity") int quantity)
+            @RequestParam(name = RENTAL_TYPE_PARAMETER_KEY) String rentalType,
+            @RequestParam(name = RENTALS_QUANTITY_PARAMETER_KEY) int quantity)
     {
 
         /* NOTE:
@@ -61,6 +57,9 @@ public class RentalController {
 
         //Assembling the message that will be sent to Kafka.
         JsonObject payload = assembleMessage(rentalType, quantity);
+
+        // If params are not valid, exception will stop execution.
+        RentalUtils.validateRentalParams(payload);
 
         sendKafkaMessage(
                 payload.toString(),
@@ -78,20 +77,18 @@ public class RentalController {
      *                          Also represents a kafka topic.
      * @param rentalTypes List of atomic rentals. Each represents a rental type and a kafka topic {@link com.bikes.renting.model.RentalTypes}.
      * @param quantities Amount of hours/days/weeks for the rental type.
-     *
-     * @return This return is NOT a production kind of return but a way to assert endpoint reach.
      */
     @RequestMapping(
             value = "/rental",
             method = RequestMethod.POST,
-            params = {"rentalType", "subRental", "quantity"}, // To allow overloaded methods based on parameters
+            params = {RENTAL_TYPE_PARAMETER_KEY, NESTED_RENTALS_PARAMETER_KEY, RENTALS_QUANTITY_PARAMETER_KEY}, // To allow overloaded methods based on parameters
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public @ResponseBody
     void saveBikeRental(
-            @RequestParam (name = "rentalType") String composedTopicType,
-            @RequestParam (name = "subRental", required = false) List<String> rentalTypes,
-            @RequestParam (name = "quantity") List<String> quantities)
+            @RequestParam (name = RENTAL_TYPE_PARAMETER_KEY) String composedTopicType,
+            @RequestParam (name = NESTED_RENTALS_PARAMETER_KEY, required = false) List<String> rentalTypes,
+            @RequestParam (name = RENTALS_QUANTITY_PARAMETER_KEY) List<String> quantities)
     {
 
         /* NOTE:
@@ -101,6 +98,9 @@ public class RentalController {
 
         //Assembling the message that will be sent to Kafka.
         JsonObject payload = assembleMessage(composedTopicType, rentalTypes, quantities);
+
+        // If params are not valid, exception will stop execution.
+        RentalUtils.validateRentalParams(payload);
 
         sendKafkaMessage(
                 payload.toString(),
@@ -171,23 +171,24 @@ public class RentalController {
      *                          Also represents a kafka topic.
      * @param rentalTypes List of atomic rentals. Each represents a rental type and a kafka topic {@link com.bikes.renting.model.RentalTypes}.
      * @param quantities Amount of hours/days/weeks for the rental type.
-     *
-     * @return This return is NOT a production kind of return but a way to assert endpoint reach.
      */
     @RequestMapping(
             value = "/rental",
             method = RequestMethod.GET,
-            params = {"rentalType", "subRental", "quantity"}, // To allow overloaded methods based on parameters
+            params = {RENTAL_TYPE_PARAMETER_KEY, NESTED_RENTALS_PARAMETER_KEY, RENTALS_QUANTITY_PARAMETER_KEY}, // To allow overloaded methods based on parameters
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public void getResponse(
-            @RequestParam (name = "rentalType") String composedTopicType,
-            @RequestParam (name = "subRental") List<String> rentalTypes,
-            @RequestParam (name = "quantity") List<String> quantities)
+            @RequestParam (name = RENTAL_TYPE_PARAMETER_KEY) String composedTopicType,
+            @RequestParam (name = NESTED_RENTALS_PARAMETER_KEY) List<String> rentalTypes,
+            @RequestParam (name = RENTALS_QUANTITY_PARAMETER_KEY) List<String> quantities)
     {
         JsonObject payload = assembleMessage(composedTopicType, rentalTypes, quantities);
+
+        // If params are not valid, exception will stop execution.
+        RentalUtils.validateRentalParams(payload);
 
         sendKafkaMessage(
                 payload.toString(),
@@ -200,21 +201,23 @@ public class RentalController {
      *
      * @param rentalType Atomic rental representing a rental type and a kafka topic {@link com.bikes.renting.model.RentalTypes}.
      * @param quantity Amount of hours/days/weeks for the rental type.
-     * @return This return is NOT a production kind of return but a way to assert endpoint reach.
      */
     @RequestMapping(
             value = "/rental",
             method = RequestMethod.GET,
-            params = {"rentalType", "quantity"}, // To allow overloaded methods based on parameters
+            params = {RENTAL_TYPE_PARAMETER_KEY, RENTALS_QUANTITY_PARAMETER_KEY}, // To allow overloaded methods based on parameters
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public void getResponse(
-            @RequestParam(name = "rentalType") String rentalType,
-            @RequestParam(name = "quantity") int quantity)
+            @RequestParam(name = RENTAL_TYPE_PARAMETER_KEY) String rentalType,
+            @RequestParam(name = RENTALS_QUANTITY_PARAMETER_KEY) int quantity)
     {
         JsonObject payload = assembleMessage(rentalType, quantity);
+
+        // If params are not valid, exception will stop execution.
+        RentalUtils.validateRentalParams(payload);
 
         sendKafkaMessage(
                 payload.toString(),

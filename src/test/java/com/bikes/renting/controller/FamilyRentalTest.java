@@ -22,8 +22,9 @@ public class FamilyRentalTest {
 
     @Before
     public void setUp() {
-        JsonParser jp = new JsonParser();
-        JsonObject jo = jp.parse(jsonTestString).getAsJsonObject();
+        JsonObject jo = new JsonParser().
+                parse(jsonTestString)
+                .getAsJsonObject();
         familyRental = new FamilyRental(jo.get(NESTED_RENTALS_JSON_KEY).getAsJsonArray());
     }
 
