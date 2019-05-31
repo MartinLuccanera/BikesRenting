@@ -34,11 +34,14 @@ All configurations are stored in
 ## Configuration classes:
 
 **_RentalTypes_** -> Stores all types of rentals.
+
 **_PricingConstants_** -> Price for each rental_type.
+
 **_JsonKeyConstants_** -> Messages are sent as Json. Keys used are stored here.
+
 **_ParametersConstants_** -> Parameters received via endpoints are stored here.
 
-##App description:
+## App description:
 
 Data (rental information) is received via REST API endpoint:
 
@@ -46,7 +49,8 @@ Data (rental information) is received via REST API endpoint:
 
 Messages are sent in-app via a kafka message model.
 
-##App flow
+## App flow
+
 To start the app we can use an IDE and run **Application** or from console
 
 ```
@@ -70,7 +74,8 @@ for possible messages in a loop.
 
 In-app the message received via API is converted to Json with the following layout:
 
-##Json layout
+## Json layout
+
 
 JSON structure for regular rentals
 ```json
@@ -117,7 +122,7 @@ At this point, we are ready to instantiate the rentalTypes and calculate the cos
 **__Disclaimer__**: As the process cannot be completely seen just by running the app, I created a bunch of tests so that 
 the behaviour can be put to the test (also many utilities like JsonParsing, messages creation and validation, etc), hence:
 
-##Tests
+## Tests
 
 Tests can be run classically by 
 ```
