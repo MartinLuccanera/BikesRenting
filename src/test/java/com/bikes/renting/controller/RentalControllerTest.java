@@ -1,6 +1,6 @@
 package com.bikes.renting.controller;
 
-import com.bikes.renting.SimpleKafkaProducerApplication;
+import com.bikes.renting.Application;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
@@ -19,7 +19,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = SimpleKafkaProducerApplication.class, webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = Application.class, webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RentalControllerTest {
     private String baseUrl = "http://127.0.0.1:";
 

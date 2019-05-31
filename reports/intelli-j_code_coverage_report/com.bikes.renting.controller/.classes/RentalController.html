@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RentalController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.bikes.renting.controller</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RentalController (com.bikes.renting.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RentalController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/ 16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.bikes.renting.controller;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.google.gson.JsonObject;
+<i>4</i>&nbsp;import org.apache.catalina.connector.Response;
+<i>5</i>&nbsp;import org.apache.log4j.Logger;
+<i>6</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>7</i>&nbsp;import org.springframework.http.MediaType;
+<i>8</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>9</i>&nbsp;import org.springframework.web.bind.annotation.*;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import java.util.List;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;import static com.bikes.renting.controller.ParametersConstants.*;
+<i>14</i>&nbsp;import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTAL_TYPE_JSON_KEY;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;//TODO: How to test https://reversecoding.net/spring-mvc-requestparam-binding-request-parameters/
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;/**
+<i>19</i>&nbsp; * &lt;p&gt;Endpoint to post bike rental information and/or obtain rental pricing.&lt;/p&gt;
+<i>20</i>&nbsp; */
+<i>21</i>&nbsp;@RestController
+<i>22</i>&nbsp;@org.springframework.stereotype.Controller
+<i>23</i>&nbsp;@RequestMapping(&quot;/bike&quot;)
+<i>24</i>&nbsp;@ResponseStatus(HttpStatus.OK)
+<b class="fc"><i>25</i>&nbsp;public class RentalController {</b>
+<b class="fc"><i>26</i>&nbsp;    private static final Logger logger = Logger.getLogger(RentalController.class);</b>
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    /**
+<i>29</i>&nbsp;     * &lt;p&gt;Endpoint to store calculations into persistent resource.
+<i>30</i>&nbsp;     * Once kafka message reaches {@link org.apache.kafka.clients.consumer.KafkaConsumer} it will be persisted.&lt;/p&gt;
+<i>31</i>&nbsp;     * &lt;p&gt;Rental types are also used as kafka topics.&lt;/p&gt;
+<i>32</i>&nbsp;     *
+<i>33</i>&nbsp;     * @param rentalType Atomic rental type which also is used as kafka topic {@link com.bikes.renting.model.RentalTypes}.
+<i>34</i>&nbsp;     * @param quantity Amount of hours/days/weeks for the rental type.
+<i>35</i>&nbsp;     */
+<i>36</i>&nbsp;    @RequestMapping(
+<i>37</i>&nbsp;            value = &quot;/rental&quot;,
+<i>38</i>&nbsp;            method = RequestMethod.POST,
+<i>39</i>&nbsp;            params = {RENTAL_TYPE_PARAMETER_KEY, RENTALS_QUANTITY_PARAMETER_KEY}, // To allow overloaded methods based on parameters
+<i>40</i>&nbsp;            produces = MediaType.APPLICATION_JSON_VALUE)
+<i>41</i>&nbsp;    @ResponseStatus(value = HttpStatus.OK)
+<i>42</i>&nbsp;    public @ResponseBody
+<i>43</i>&nbsp;    ResponseEntity&lt;String&gt; saveBikeRental(
+<i>44</i>&nbsp;            @RequestParam(name = RENTAL_TYPE_PARAMETER_KEY) String rentalType,
+<i>45</i>&nbsp;            @RequestParam(name = RENTALS_QUANTITY_PARAMETER_KEY) int quantity)
+<i>46</i>&nbsp;    {
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;        /* NOTE:
+<i>49</i>&nbsp;         * Here we should check for params format, validity, quantity, etc.
+<i>50</i>&nbsp;         * For simplicity&#39;s sake I&#39;ll just avoid said checks.
+<i>51</i>&nbsp;         * NOTE2:
+<i>52</i>&nbsp;         * Some of those checks have been implemented in RentalUtils.
+<i>53</i>&nbsp;         */
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;        //Assembling the message that will be sent to Kafka.
+<b class="fc"><i>56</i>&nbsp;        JsonObject payload = KafkaUtils.assembleMessage(rentalType, quantity);</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;        // If params are not valid, exceptions will stop execution.
+<b class="fc"><i>59</i>&nbsp;        RentalUtils.validateRentalParams(payload);</b>
+<i>60</i>&nbsp;
+<b class="fc"><i>61</i>&nbsp;        KafkaUtils.sendKafkaMessage(</b>
+<b class="fc"><i>62</i>&nbsp;                payload.toString(),</b>
+<b class="fc"><i>63</i>&nbsp;                payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString()</b>
+<i>64</i>&nbsp;        );
+<i>65</i>&nbsp;
+<b class="fc"><i>66</i>&nbsp;        logger.debug(&quot;Message &quot; + payload.toString() + &quot; sent.&quot;);</b>
+<i>67</i>&nbsp;
+<b class="fc"><i>68</i>&nbsp;        return new ResponseEntity&lt;&gt;(&quot;Sent message: \n&quot; + payload.toString(),</b>
+<i>69</i>&nbsp;                HttpStatus.OK);
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     * &lt;p&gt;Endpoint to store calculations into persistent resource.
+<i>74</i>&nbsp;     * Once kafka message reaches {@link org.apache.kafka.clients.consumer.KafkaConsumer} it will be persisted.&lt;/p&gt;
+<i>75</i>&nbsp;     * &lt;p&gt;Rental types are also used as kafka topics.&lt;/p&gt;
+<i>76</i>&nbsp;     *
+<i>77</i>&nbsp;     * @param composedTopicType Should be a composed kind of rental {@link com.bikes.renting.model.RentalTypes}.
+<i>78</i>&nbsp;     *                          Also represents a kafka topic.
+<i>79</i>&nbsp;     * @param rentalTypes List of atomic rentals. Each represents a rental type and a kafka topic {@link com.bikes.renting.model.RentalTypes}.
+<i>80</i>&nbsp;     * @param quantities Amount of hours/days/weeks for the rental type.
+<i>81</i>&nbsp;     */
+<i>82</i>&nbsp;    @RequestMapping(
+<i>83</i>&nbsp;            value = &quot;/rental&quot;,
+<i>84</i>&nbsp;            method = RequestMethod.POST,
+<i>85</i>&nbsp;            params = {RENTAL_TYPE_PARAMETER_KEY, NESTED_RENTALS_PARAMETER_KEY, RENTALS_QUANTITY_PARAMETER_KEY}, // To allow overloaded methods based on parameters
+<i>86</i>&nbsp;            produces = MediaType.APPLICATION_JSON_VALUE)
+<i>87</i>&nbsp;    @ResponseStatus(value = HttpStatus.OK)
+<i>88</i>&nbsp;    public @ResponseBody
+<i>89</i>&nbsp;    ResponseEntity&lt;String&gt; saveBikeRental(
+<i>90</i>&nbsp;            @RequestParam (name = RENTAL_TYPE_PARAMETER_KEY) String composedTopicType,
+<i>91</i>&nbsp;            @RequestParam (name = NESTED_RENTALS_PARAMETER_KEY, required = false) List&lt;String&gt; rentalTypes,
+<i>92</i>&nbsp;            @RequestParam (name = RENTALS_QUANTITY_PARAMETER_KEY) List&lt;Integer&gt; quantities)
+<i>93</i>&nbsp;    {
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;        /* NOTE:
+<i>96</i>&nbsp;         * Here we should check for params format, validity, quantity, etc.
+<i>97</i>&nbsp;         * For simplicity&#39;s sake I&#39;ll just avoid said checks.
+<i>98</i>&nbsp;         * NOTE2:
+<i>99</i>&nbsp;         * Some of those checks have been implemented in RentalUtils.
+<i>100</i>&nbsp;         */
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;        //Assembling the message that will be sent to Kafka.
+<b class="fc"><i>103</i>&nbsp;        JsonObject payload = KafkaUtils.assembleMessage(composedTopicType, rentalTypes, quantities);</b>
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;        // If params are not valid, exception will stop execution.
+<b class="fc"><i>106</i>&nbsp;        RentalUtils.validateRentalParams(payload);</b>
+<i>107</i>&nbsp;
+<b class="fc"><i>108</i>&nbsp;        KafkaUtils.sendKafkaMessage(</b>
+<b class="fc"><i>109</i>&nbsp;                payload.toString(),</b>
+<b class="fc"><i>110</i>&nbsp;                payload.getAsJsonPrimitive(RENTAL_TYPE_JSON_KEY).getAsString()</b>
+<i>111</i>&nbsp;        );
+<i>112</i>&nbsp;
+<b class="fc"><i>113</i>&nbsp;        logger.debug(&quot;Message &quot; + payload.toString() + &quot; sent.&quot;);</b>
+<b class="fc"><i>114</i>&nbsp;        return new ResponseEntity&lt;&gt;(&quot;Sent message: \n&quot; + payload.toString(),</b>
+<i>115</i>&nbsp;                HttpStatus.OK);
+<i>116</i>&nbsp;    }
+<i>117</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-05-31 02:50</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: KafkaProducerFactory</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.bikes.renting.model.message_engine.producer</a> ]
+</div>
+
+<h1>Coverage Summary for Class: KafkaProducerFactory (com.bikes.renting.model.message_engine.producer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">KafkaProducerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/ 18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.bikes.renting.model.message_engine.producer;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.apache.kafka.clients.producer.KafkaProducer;
+<i>4</i>&nbsp;import org.apache.log4j.Logger;
+<i>5</i>&nbsp;import org.springframework.beans.factory.annotation.Value;
+<i>6</i>&nbsp;import org.springframework.stereotype.Component;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import java.util.Properties;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;/**
+<i>11</i>&nbsp; * &lt;p&gt;Kafka producer instantiation as a Singleton.
+<i>12</i>&nbsp; * Kafka producers subscribe messages to topics to be read by consumers {@link org.apache.kafka.clients.consumer.KafkaConsumer}.&lt;/p&gt;
+<i>13</i>&nbsp; */
+<i>14</i>&nbsp;@Component
+<b class="fc"><i>15</i>&nbsp;public class KafkaProducerFactory {</b>
+<b class="fc"><i>16</i>&nbsp;    private static final Logger logger = Logger.getLogger(KafkaProducerFactory.class);</b>
+<i>17</i>&nbsp;    private static KafkaProducer&lt;String, String&gt; producer;
+<i>18</i>&nbsp;    private static String kafkaBootstrapServers;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    /**
+<i>21</i>&nbsp;     * &lt;p&gt;Instantiates a kafkaProducer if none exists.&lt;/p&gt;
+<i>22</i>&nbsp;     *
+<i>23</i>&nbsp;     * @return A fully fledged kafkaProducer.
+<i>24</i>&nbsp;     */
+<i>25</i>&nbsp;    public static KafkaProducer&lt;String, String&gt; createKafKafkaProducer() {
+<b class="fc"><i>26</i>&nbsp;        if (producer == null) {</b>
+<i>27</i>&nbsp;            /*
+<i>28</i>&nbsp;             * Defining producer properties.
+<i>29</i>&nbsp;             */
+<b class="fc"><i>30</i>&nbsp;            Properties producerProperties = new Properties();</b>
+<b class="fc"><i>31</i>&nbsp;            producerProperties.put(&quot;bootstrap.servers&quot;, kafkaBootstrapServers);</b>
+<b class="fc"><i>32</i>&nbsp;            producerProperties.put(&quot;acks&quot;, &quot;all&quot;);</b>
+<b class="fc"><i>33</i>&nbsp;            producerProperties.put(&quot;retries&quot;, 0);</b>
+<b class="fc"><i>34</i>&nbsp;            producerProperties.put(&quot;batch.size&quot;, 16384);</b>
+<b class="fc"><i>35</i>&nbsp;            producerProperties.put(&quot;linger.ms&quot;, 1);</b>
+<b class="fc"><i>36</i>&nbsp;            producerProperties.put(&quot;reconnect.backoff.ms&quot;, &quot;5000&quot;);</b>
+<b class="fc"><i>37</i>&nbsp;            producerProperties.put(&quot;buffer.memory&quot;, 33554432);</b>
+<b class="fc"><i>38</i>&nbsp;            producerProperties.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</b>
+<b class="fc"><i>39</i>&nbsp;            producerProperties.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</b>
+<i>40</i>&nbsp;            /*
+<i>41</i>&nbsp;             * Creating a Kafka Producer object with above configuration.
+<i>42</i>&nbsp;             */
+<b class="fc"><i>43</i>&nbsp;            producer = new KafkaProducer&lt;&gt;(producerProperties);</b>
+<b class="fc"><i>44</i>&nbsp;            logger.debug(&quot;Created kafkaProducer with properties:\n&quot; + producerProperties.toString());</b>
+<i>45</i>&nbsp;        }
+<b class="fc"><i>46</i>&nbsp;        return producer;</b>
+<i>47</i>&nbsp;    }
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    /**
+<i>50</i>&nbsp;     * Setter to avoid issues while injecting spring @value into static context.
+<i>51</i>&nbsp;     *
+<i>52</i>&nbsp;     * @param server Bootstrap server address as is on application.properties.
+<i>53</i>&nbsp;     */
+<i>54</i>&nbsp;    @Value(&quot;${kafka.bootstrap.servers}&quot;)
+<i>55</i>&nbsp;    public void setBootstrapServer(String server) {
+<b class="fc"><i>56</i>&nbsp;        kafkaBootstrapServers = server;</b>
+<b class="fc"><i>57</i>&nbsp;    }</b>
+<i>58</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-05-31 02:50</div>
+</div>
+</body>
+</html>

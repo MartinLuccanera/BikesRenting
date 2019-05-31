@@ -1,0 +1,107 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RentalTypes</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.bikes.renting.model</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RentalTypes (com.bikes.renting.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RentalTypes</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.bikes.renting.model;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.google.common.collect.ImmutableList;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp; * Helper class to keep rental types / kafka topics.
+<i>7</i>&nbsp; */
+<b class="nc"><i>8</i>&nbsp;public class RentalTypes {</b>
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;    public static final String RENTAL_TYPE_FAMILY = &quot;family&quot;;
+<i>11</i>&nbsp;    public static final String RENTAL_TYPE_HOUR = &quot;hour&quot;;
+<i>12</i>&nbsp;    public static final String RENTAL_TYPE_DAY = &quot;day&quot;;
+<i>13</i>&nbsp;    public static final String RENTAL_TYPE_WEEK = &quot;week&quot;;
+<i>14</i>&nbsp;    /**
+<i>15</i>&nbsp;     * List of composed topic types for kafka. (Example: family type of rental)
+<i>16</i>&nbsp;     */
+<b class="fc"><i>17</i>&nbsp;    public static final ImmutableList&lt;String&gt; COMPOSED_TOPICS = ImmutableList.of(RENTAL_TYPE_FAMILY);</b>
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    /**
+<i>20</i>&nbsp;     * List of topics for kafka (kinds of rental).
+<i>21</i>&nbsp;     */
+<b class="fc"><i>22</i>&nbsp;    public static final ImmutableList&lt;String&gt; TOPICS = ImmutableList.of(RENTAL_TYPE_HOUR,RENTAL_TYPE_DAY,RENTAL_TYPE_WEEK,</b>
+<b class="fc"><i>23</i>&nbsp;            String.join(&quot;,&quot;, COMPOSED_TOPICS));</b>
+<i>24</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-05-31 02:50</div>
+</div>
+</body>
+</html>

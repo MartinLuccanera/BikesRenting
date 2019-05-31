@@ -1,0 +1,147 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RentalUtils</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.bikes.renting.controller</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RentalUtils (com.bikes.renting.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RentalUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66,7%
+  </span>
+  <span class="absValue">
+    (2/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95,2%
+  </span>
+  <span class="absValue">
+    (20/ 21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.bikes.renting.controller;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.bikes.renting.model.iface.Rental;
+<i>4</i>&nbsp;import com.bikes.renting.model.impl.RentalFactory;
+<i>5</i>&nbsp;import com.google.gson.JsonArray;
+<i>6</i>&nbsp;import com.google.gson.JsonObject;
+<i>7</i>&nbsp;import org.apache.log4j.Logger;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import static com.bikes.renting.model.PricingConstants.FAMILY_MAX_SIZE;
+<i>10</i>&nbsp;import static com.bikes.renting.model.PricingConstants.FAMILY_MIN_SIZE;
+<i>11</i>&nbsp;import static com.bikes.renting.model.RentalTypes.RENTAL_TYPE_FAMILY;
+<i>12</i>&nbsp;import static com.bikes.renting.model.message_engine.JsonKeyConstants.NESTED_RENTALS_JSON_KEY;
+<i>13</i>&nbsp;import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTAL_TYPE_JSON_KEY;
+<i>14</i>&nbsp;
+<b class="nc"><i>15</i>&nbsp;public class RentalUtils {</b>
+<b class="fc"><i>16</i>&nbsp;    private static final Logger logger = Logger.getLogger(RentalUtils.class);</b>
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    /**
+<i>19</i>&nbsp;     * Runs validations on payload received from API endpoint {@link RentalController}.
+<i>20</i>&nbsp;     * If anything fails, execution is stopped and exception is raised.
+<i>21</i>&nbsp;     *
+<i>22</i>&nbsp;     * @param message The result of an API request.
+<i>23</i>&nbsp;     */
+<i>24</i>&nbsp;    public static boolean validateRentalParams(JsonObject message) {
+<i>25</i>&nbsp;        // Checking for validity of parameters sent through API.
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;        // It&#39;s not a single rental nor a composed rental.
+<b class="fc"><i>28</i>&nbsp;        if (message.get(RENTAL_TYPE_JSON_KEY) == null || (message.get(RENTAL_TYPE_JSON_KEY).getAsString().equals(RENTAL_TYPE_FAMILY)</b>
+<b class="fc"><i>29</i>&nbsp;                                                            &amp;&amp; message.get(NESTED_RENTALS_JSON_KEY) == null)</b>
+<i>30</i>&nbsp;                ) {
+<b class="fc"><i>31</i>&nbsp;            String error = &quot;Payload is missing a mandatory field.&quot; + message.toString();</b>
+<b class="fc"><i>32</i>&nbsp;            logger.error(error);</b>
+<b class="fc"><i>33</i>&nbsp;            throw new RuntimeException(error);</b>
+<i>34</i>&nbsp;        }
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;        // Here we will handle single rentals.
+<b class="fc"><i>37</i>&nbsp;        if (!message.get(RENTAL_TYPE_JSON_KEY).getAsString().equals(RENTAL_TYPE_FAMILY)) {</b>
+<b class="fc"><i>38</i>&nbsp;            String msg = &quot;Payload is not composite rental.&quot; + message.toString();</b>
+<b class="fc"><i>39</i>&nbsp;            logger.info(msg);</b>
+<i>40</i>&nbsp;
+<b class="fc"><i>41</i>&nbsp;            Rental rental = RentalFactory.createRental(message);</b>
+<b class="fc"><i>42</i>&nbsp;            logger.info(&quot;Cost of rental: &quot; + rental.calculateRentalPricing());</b>
+<b class="fc"><i>43</i>&nbsp;            return true;</b>
+<i>44</i>&nbsp;        }
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;        // Going forward we will handle composed rentals.
+<b class="fc"><i>47</i>&nbsp;        JsonArray rentals = message.getAsJsonArray(NESTED_RENTALS_JSON_KEY);</b>
+<i>48</i>&nbsp;        //TODO: Should check for nested composed rental-types.
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;        // Composed rentals have min and max quantities.
+<b class="fc"><i>51</i>&nbsp;        if (rentals.size() &gt; FAMILY_MAX_SIZE || rentals.size() &lt; FAMILY_MIN_SIZE) {</b>
+<b class="fc"><i>52</i>&nbsp;            String error = &quot;Payload has an incorrect number of rentals.&quot; + message.toString();</b>
+<b class="fc"><i>53</i>&nbsp;            logger.error(error);</b>
+<b class="fc"><i>54</i>&nbsp;            throw new RuntimeException(error);</b>
+<i>55</i>&nbsp;        }
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;        //if we got to this point, then we are dealing with a properly formatted Json to calculate
+<i>58</i>&nbsp;        // a composed type of rental.
+<i>59</i>&nbsp;
+<b class="fc"><i>60</i>&nbsp;        String msg = &quot;Payload is a composite rental.&quot; + message.toString();</b>
+<b class="fc"><i>61</i>&nbsp;        logger.info(msg);</b>
+<b class="fc"><i>62</i>&nbsp;        return true;</b>
+<i>63</i>&nbsp;    }
+<i>64</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-05-31 02:50</div>
+</div>
+</body>
+</html>

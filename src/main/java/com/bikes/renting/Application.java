@@ -19,8 +19,8 @@ import java.time.Duration;
 import static com.bikes.renting.model.RentalTypes.TOPICS;
 
 @SpringBootApplication
-public class SimpleKafkaProducerApplication implements CommandLineRunner {
-    private static final Logger logger = Logger.getLogger(SimpleKafkaProducerApplication.class);
+public class Application implements CommandLineRunner {
+    private static final Logger logger = Logger.getLogger(Application.class);
 
     /**
      * <p>Starts the application.
@@ -31,7 +31,7 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
      * @param args nothing special, regular java boilerplate code.
      */
     public static void main( String[] args ) {
-        SpringApplication.run(SimpleKafkaProducerApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
     @Override

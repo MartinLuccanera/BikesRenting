@@ -1,0 +1,175 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: KafkaUtils</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.bikes.renting.controller</a> ]
+</div>
+
+<h1>Coverage Summary for Class: KafkaUtils (com.bikes.renting.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">KafkaUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96,2%
+  </span>
+  <span class="absValue">
+    (25/ 26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.bikes.renting.controller;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.google.gson.JsonArray;
+<i>4</i>&nbsp;import com.google.gson.JsonObject;
+<i>5</i>&nbsp;import org.apache.kafka.clients.producer.KafkaProducer;
+<i>6</i>&nbsp;import org.apache.kafka.clients.producer.ProducerRecord;
+<i>7</i>&nbsp;import org.apache.log4j.Logger;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import java.util.Iterator;
+<i>10</i>&nbsp;import java.util.List;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import static com.bikes.renting.model.message_engine.JsonKeyConstants.NESTED_RENTALS_JSON_KEY;
+<i>13</i>&nbsp;import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTALS_QUANTITY_JSON_KEY;
+<i>14</i>&nbsp;import static com.bikes.renting.model.message_engine.JsonKeyConstants.RENTAL_TYPE_JSON_KEY;
+<i>15</i>&nbsp;import static com.bikes.renting.model.message_engine.producer.KafkaProducerFactory.createKafKafkaProducer;
+<i>16</i>&nbsp;
+<b class="nc"><i>17</i>&nbsp;public class KafkaUtils {</b>
+<b class="fc"><i>18</i>&nbsp;    private static final Logger logger = Logger.getLogger(KafkaUtils.class);</b>
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    /**
+<i>21</i>&nbsp;     * &lt;p&gt;Given request parameters, assembles a {@link JsonObject} message to send to kafka.&lt;/p&gt;
+<i>22</i>&nbsp;     * &lt;p&gt;Overloaded method for the generation of nested rentals.&lt;/p&gt;
+<i>23</i>&nbsp;     *
+<i>24</i>&nbsp;     * @param composedTopicType Should be a composed-topic kind of topic {@link com.bikes.renting.model.RentalTypes}.
+<i>25</i>&nbsp;     * @param rentalTypes List of atomic rentals. Each represents a rental type and a kafka topic {@link com.bikes.renting.model.RentalTypes}.
+<i>26</i>&nbsp;     * @param quantities Amount of hours/days/weeks for the rental type.
+<i>27</i>&nbsp;     *
+<i>28</i>&nbsp;     * @return Kafka-ready message as {@link JsonObject}.
+<i>29</i>&nbsp;     */
+<i>30</i>&nbsp;    public static JsonObject assembleMessage(String composedTopicType, List&lt;String&gt; rentalTypes, List&lt;Integer&gt; quantities) {
+<i>31</i>&nbsp;        //Here we create a JsonObject that contains a JsonArray of JsonObjects. For more info refer to README.md
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;        //payload is the message we will send to kafka as a JsonObject
+<b class="fc"><i>34</i>&nbsp;        JsonObject payload = new JsonObject();</b>
+<b class="fc"><i>35</i>&nbsp;        payload.addProperty(RENTAL_TYPE_JSON_KEY, composedTopicType);</b>
+<i>36</i>&nbsp;
+<b class="fc"><i>37</i>&nbsp;        JsonArray subRentalsArray = new JsonArray();</b>
+<b class="fc"><i>38</i>&nbsp;        JsonObject subRental = new JsonObject();</b>
+<i>39</i>&nbsp;
+<b class="fc"><i>40</i>&nbsp;        Iterator i1 = rentalTypes.iterator();</b>
+<b class="fc"><i>41</i>&nbsp;        Iterator i2 = quantities.iterator();</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;        //We read through both lists of parameters and put them together in a single JsonObject
+<b class="fc"><i>44</i>&nbsp;        while (i1.hasNext() &amp;&amp; i2.hasNext()) {</b>
+<b class="fc"><i>45</i>&nbsp;            subRental.addProperty(</b>
+<i>46</i>&nbsp;                    RENTAL_TYPE_JSON_KEY,
+<b class="fc"><i>47</i>&nbsp;                    i1.next().toString()</b>
+<i>48</i>&nbsp;            );
+<b class="fc"><i>49</i>&nbsp;            subRentalsArray.add(subRental);</b>
+<b class="fc"><i>50</i>&nbsp;            subRental.addProperty(</b>
+<i>51</i>&nbsp;                    RENTALS_QUANTITY_JSON_KEY,
+<b class="fc"><i>52</i>&nbsp;                    Integer.valueOf(i2.next().toString())</b>
+<i>53</i>&nbsp;            );
+<b class="fc"><i>54</i>&nbsp;            subRental = new JsonObject();</b>
+<i>55</i>&nbsp;        }
+<i>56</i>&nbsp;
+<b class="fc"><i>57</i>&nbsp;        payload.add(NESTED_RENTALS_JSON_KEY, subRentalsArray);</b>
+<b class="fc"><i>58</i>&nbsp;        return payload;</b>
+<i>59</i>&nbsp;    }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    /**
+<i>62</i>&nbsp;     * &lt;p&gt;Given request parameters, assembles a {@link JsonObject} message to send to kafka.&lt;/p&gt;
+<i>63</i>&nbsp;     * &lt;p&gt;Overloaded method for the generation of simple rentals.&lt;/p&gt;
+<i>64</i>&nbsp;     *
+<i>65</i>&nbsp;     * @param rentalType Atomic rental type which also is used as kafka topic {@link com.bikes.renting.model.RentalTypes}.
+<i>66</i>&nbsp;     * @param quantity Amount of hours/days/weeks for the rental type.
+<i>67</i>&nbsp;     *
+<i>68</i>&nbsp;     * @return @return Kafka-ready message as {@link JsonObject}.
+<i>69</i>&nbsp;     */
+<i>70</i>&nbsp;    public static JsonObject assembleMessage(String rentalType, int quantity) {
+<b class="fc"><i>71</i>&nbsp;        JsonObject familyRental = new JsonObject();</b>
+<b class="fc"><i>72</i>&nbsp;        familyRental.addProperty(RENTAL_TYPE_JSON_KEY, rentalType);</b>
+<b class="fc"><i>73</i>&nbsp;        familyRental.addProperty(RENTALS_QUANTITY_JSON_KEY, quantity);</b>
+<b class="fc"><i>74</i>&nbsp;        return familyRental;</b>
+<i>75</i>&nbsp;    }
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;    /**
+<i>79</i>&nbsp;     * &lt;p&gt;Function to send messages to kafka. Receives producer (sender) and message as parameters&lt;/p&gt;
+<i>80</i>&nbsp;     *
+<i>81</i>&nbsp;     * @param payload Message to be sent via {@link KafkaProducer}.
+<i>82</i>&nbsp;     * @param topic Kafka topic in which we are gonna send this message {@link com.bikes.renting.model.RentalTypes}
+<i>83</i>&nbsp;     */
+<i>84</i>&nbsp;    public static void sendKafkaMessage(String payload, String topic) {
+<i>85</i>&nbsp;        //Singleton creator.
+<b class="fc"><i>86</i>&nbsp;        KafkaProducer&lt;String, String&gt; kafkaProducer = createKafKafkaProducer();</b>
+<b class="fc"><i>87</i>&nbsp;        logger.debug(&quot;producer created \n&quot; + kafkaProducer.toString());</b>
+<b class="fc"><i>88</i>&nbsp;        logger.info(&quot;Sending Kafka message: \n&quot; + payload);</b>
+<i>89</i>&nbsp;
+<b class="fc"><i>90</i>&nbsp;        kafkaProducer.send(new ProducerRecord&lt;&gt;(topic, payload));</b>
+<b class="fc"><i>91</i>&nbsp;    }</b>
+<i>92</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-05-31 02:50</div>
+</div>
+</body>
+</html>
