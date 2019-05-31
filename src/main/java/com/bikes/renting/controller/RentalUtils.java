@@ -21,24 +21,26 @@ public class RentalUtils {
      *
      * @param message The result of an API request.
      */
-    public static void validateRentalParams(JsonObject message) {
+    public static boolean validateRentalParams(JsonObject message) {
         // Checking for validity of parameters sent through API.
 
         // It's not a single rental nor a composed rental.
-        if (message.get(RENTAL_TYPE_JSON_KEY) == null || message.get(NESTED_RENTALS_JSON_KEY) == null) {
-            String error = "Payload is missing mandatory field." + message.toString();
+        if (message.get(RENTAL_TYPE_JSON_KEY) == null || (message.get(RENTAL_TYPE_JSON_KEY).getAsString().equals(RENTAL_TYPE_FAMILY)
+                                                            && message.get(NESTED_RENTALS_JSON_KEY) == null)
+                ) {
+            String error = "Payload is missing a mandatory field." + message.toString();
             logger.error(error);
             throw new RuntimeException(error);
         }
 
         // Here we will handle single rentals.
         if (!message.get(RENTAL_TYPE_JSON_KEY).getAsString().equals(RENTAL_TYPE_FAMILY)) {
-            //TODO: Should really check for rental types being only atomic and not composed.
             String msg = "Payload is not composite rental." + message.toString();
             logger.info(msg);
 
             Rental rental = RentalFactory.createRental(message);
             logger.info("Cost of rental: " + rental.calculateRentalPricing());
+            return true;
         }
 
         // Going forward we will handle composed rentals.
@@ -57,5 +59,6 @@ public class RentalUtils {
 
         String msg = "Payload is a composite rental." + message.toString();
         logger.info(msg);
+        return true;
     }
 }

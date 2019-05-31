@@ -43,7 +43,7 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
             logger.info("Starting Kafka consumer thread.");
             KafkaConsumer<String, String> simpleKafkaConsumer = KafkaConsumerFactory.
                     createKafKafkaConsumer(TOPICS);
-            runSingleWorker(simpleKafkaConsumer);
+            runKafkaConsumer(simpleKafkaConsumer);
         });
 
         /*
@@ -57,7 +57,7 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
      * <p>This function will start a single worker thread per topic.
      * After creating the consumer object, we subscribe to a list of Kafka topics in the constructor.</p>
      */
-    private void runSingleWorker(KafkaConsumer<String, String> kafkaConsumer) {
+    private void runKafkaConsumer(KafkaConsumer<String, String> kafkaConsumer) {
 
         /*
          * We will start an infinite while loop, inside which we'll be listening to
@@ -94,7 +94,9 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
                     logger.info("Deserialized JSON object: " + receivedJsonObject);
 
                     Rental rental = RentalFactory.createRental(receivedJsonObject);
-                    logger.info("Cost of rental: " + rental.calculateRentalPricing());                }
+                    logger.info("Cost of rental: " + rental.calculateRentalPricing());
+                    //TODO: Here we should store rental information (persist).
+                }
             }
         } finally {
             kafkaConsumer.close();
