@@ -59,3 +59,9 @@ Sources:
 * [Spring testing](https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html#spring-testing-annotation-contextconfiguration)
 * [Unit testing endpoints](https://www.freecodecamp.org/news/unit-testing-services-endpoints-and-repositories-in-spring-boot-4b7d9dc2b772/)
 * [Advanced kafka examples](http://cloudurable.com/blog/kafka-tutorial-kafka-producer-advanced-java-examples/index.html)
+* https://www.programcreek.com/java-api-examples/?class=net.javacrumbs.jsonunit.JsonAssert&method=assertJsonEquals
+* https://www.baeldung.com/jsonassert
+* https://stackoverflow.com/questions/40268446/junit-5-how-to-assert-an-exception-is-thrown
+* https://stackoverflow.com/questions/2846493/is-there-a-decent-html-junit-report-plugin-for-maven
+* https://maven.apache.org/surefire/maven-surefire-report-plugin/usage.html
+* https://stackoverflow.com/questions/2472376/how-do-i-execute-a-program-using-maven

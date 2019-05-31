@@ -28,11 +28,21 @@ public class FamilyRentalTest {
         familyRental = new FamilyRental(jo.get(NESTED_RENTALS_JSON_KEY).getAsJsonArray());
     }
 
+    /**
+     * Calculates cost of rental in 2 different ways and then compares them.
+     */
     @Test
     public void sumUsingComposite_thenIndividualCalculations(){
+        // familyRental.calculateRentalPricing() instantiates all members of a composed rental and applies discount.
+        //We assert that against individual calculations.
         assertThat(familyRental.calculateRentalPricing(), equalTo(totalSum() * FAMILY_DISCOUNT));
     }
 
+    /**
+     * Instantiates several atomic rentals and adds them up.
+     *
+     * @return Sum of all individual rentals
+     */
     private double totalSum() {
         double result = 0;
 
